@@ -1,0 +1,54 @@
+name: 3 Viral Videos Daily (Auto-Uploader)
+
+on:
+  schedule:
+    # ⏰ UTC Time: 1:30 AM, 8:00 AM, 1:00 PM (Indian Time: ~7:00 AM, 1:30 PM, 6:30 PM)
+    - cron: '30 1,8,13 * * *'
+  workflow_dispatch: 
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150 
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg imagemagick
+        sudo sed -i 's/rights="none"/rights="read|write"/' /etc/ImageMagick-6/policy.xml
+
+    - name: Install Python Libraries
+      run: |
+        pip install --upgrade pip
+        pip install moviepy==1.0.3 edge-tts gtts numpy google-api-python-client google-auth-httplib2 google-auth-oauthlib Pillow==9.5.0 imageio-ffmpeg
+
+    - name: Load YouTube Tokens
+      env:
+        TOKEN_1: ${{ secrets.TOKEN_1 }}
+      run: |
+        mkdir -p tokens
+        if [ ! -z "$TOKEN_1" ]; then echo "$TOKEN_1" | base64 -d > tokens/token1.json; fi
+        echo "✅ Tokens लोड हो गए हैं!"
+
+    - name: Run Auto-Bot
+      run: |
+        python bot.py
+
+    - name: Commit updated questions.json
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add questions.json
+        git commit -m "🤖 सवाल यूज़ किए गए और JSON अपडेट किया गया" || echo "No changes to commit"
+        git push

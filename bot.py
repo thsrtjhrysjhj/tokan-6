@@ -369,6 +369,11 @@ def upload_to_youtube(video_file, total_q, seo_data):
     token_files = sorted([os.path.join(TOKENS_FOLDER, f) for f in os.listdir(TOKENS_FOLDER) if f.endswith('.json')])
     
     yt_title = seo_data.get("title", f"Top {total_q} Science GK Questions in Hindi 🚀")
+    
+    # 🔴 FIX: YouTube Title 100 Characters से बड़ा नहीं हो सकता!
+    if len(yt_title) > 95:
+        yt_title = yt_title[:95] + "..."
+        
     ai_desc = seo_data.get("description", "इस वीडियो में General Science के सबसे महत्वपूर्ण सवाल दिए गए हैं।")
     yt_desc = f"{yt_title}\n\n{ai_desc}\n\nआखिरी सवाल का जवाब कमेंट में ज़रूर बताएं! 👇\n\n#quiz #education #sciencegk"
     

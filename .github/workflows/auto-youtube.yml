@@ -5,7 +5,7 @@ on:
     # GitHub Actions UTC में चलता है
     # 00:30 UTC = सुबह 6:00 बजे IST
     # 13:30 UTC = शाम 7:00 बजे IST
-    - cron: '30 0,13 * * *'
+    - cron: '30 1,14 * * *'
 
   # जरूरत पड़ने पर manually भी चला सकते हैं
   workflow_dispatch:
